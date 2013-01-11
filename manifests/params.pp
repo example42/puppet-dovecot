@@ -17,7 +17,8 @@ class dovecot::params {
   ### Application related parameters
 
   $package = $::operatingsystem ? {
-    default => 'dovecot',
+    /(?i:Debian|Ubuntu|Mint)/ => [ 'dovecot-imapd','dovecot-pop3d' ],
+    default                   => 'dovecot',
   }
 
   $service = $::operatingsystem ? {
@@ -45,7 +46,8 @@ class dovecot::params {
   }
 
   $config_file = $::operatingsystem ? {
-    default => '/etc/dovecot/dovecot.conf',
+    /(?i:Debian|Ubuntu|Mint)/ => '/etc/dovecot/dovecot.conf',
+    default                   => '/etc/dovecot.conf',
   }
 
   $config_file_mode = $::operatingsystem ? {
@@ -81,7 +83,7 @@ class dovecot::params {
     default => '/var/log/dovecot/dovecot.log',
   }
 
-  $port = '42'
+  $port = '143'
   $protocol = 'tcp'
 
   # General Settings
