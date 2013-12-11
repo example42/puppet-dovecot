@@ -68,7 +68,8 @@ class dovecot::params {
   }
 
   $pid_file = $::operatingsystem ? {
-    default => '/var/run/dovecot.pid',
+    /(?i:Debian|Ubuntu|Mint)/ => '/var/run/dovecot/master.pid',
+    default                   => '/var/run/dovecot.pid',
   }
 
   $data_dir = $::operatingsystem ? {
