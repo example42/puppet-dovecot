@@ -90,6 +90,8 @@ class dovecot::params {
   }
 
   $port = '143'
+  $enable_pop3 = false
+  $pop3_port = '110'
   $protocol = 'tcp'
 
   # General Settings
