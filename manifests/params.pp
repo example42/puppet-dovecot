@@ -18,6 +18,7 @@ class dovecot::params {
 
   $package = $::operatingsystem ? {
     /(?i:Debian|Ubuntu|Mint)/ => [ 'dovecot-imapd','dovecot-pop3d' ],
+    /(?i:FreeBSD)/            => [ 'dovecot2', 'dovecot-pigeonhole' ],
     default                   => 'dovecot',
   }
 
@@ -42,11 +43,13 @@ class dovecot::params {
   }
 
   $config_dir = $::operatingsystem ? {
-    default => '/etc/dovecot',
+    /(?i:FreeBSD)/ => '/usr/local/etc/dovecot',
+    default        => '/etc/dovecot',
   }
 
   $config_file = $::operatingsystem ? {
     /(?i:Debian|Ubuntu|Mint)/ => '/etc/dovecot/dovecot.conf',
+    /(?i:FreeBSD)/            => '/usr/local/etc/dovecot/dovecot.conf',
     default                   => '/etc/dovecot.conf',
   }
 
@@ -59,7 +62,8 @@ class dovecot::params {
   }
 
   $config_file_group = $::operatingsystem ? {
-    default => 'root',
+    /(?i:FreeBSD)/ => 'wheel',
+    default        => 'root',
   }
 
   $config_file_init = $::operatingsystem ? {
@@ -73,7 +77,8 @@ class dovecot::params {
   }
 
   $data_dir = $::operatingsystem ? {
-    default => '/etc/dovecot',
+    /(?i:FreeBSD)/ => '/usr/local/etc/dovecot',
+    default       => '/etc/dovecot',
   }
 
   $log_dir = $::operatingsystem ? {
@@ -85,6 +90,8 @@ class dovecot::params {
   }
 
   $port = '143'
+  $enable_pop3 = false
+  $pop3_port = '110'
   $protocol = 'tcp'
 
   # General Settings

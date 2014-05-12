@@ -191,6 +191,12 @@
 #   Note: This doesn't necessarily affect the service configuration file
 #   Can be defined also by the (top scope) variable $dovecot_port
 #
+# [*enable_pop3*]
+#   Enable firewalling and monitoring on the POP3 port. Defaults to false
+#
+# [*pop3_port*]
+#   The port to use for POP3 support
+#
 # [*protocol*]
 #   The protocol used by the the service.
 #   This is used by monitor, firewall and puppi (optional) components
@@ -250,6 +256,8 @@ class dovecot (
   $log_dir             = params_lookup( 'log_dir' ),
   $log_file            = params_lookup( 'log_file' ),
   $port                = params_lookup( 'port' ),
+  $enable_pop3         = params_lookup( 'enable_pop3' ),
+  $pop3_port           = params_lookup( 'pop3_port' ),
   $protocol            = params_lookup( 'protocol' )
   ) inherits dovecot::params {
 
@@ -262,6 +270,7 @@ class dovecot (
   $bool_puppi=any2bool($puppi)
   $bool_firewall=any2bool($firewall)
   $bool_debug=any2bool($debug)
+  $bool_enable_pop3=any2bool($enable_pop3)
   $bool_audit_only=any2bool($audit_only)
 
   ### Definition of some variables used in the module
@@ -400,13 +409,22 @@ class dovecot (
     }
   }
 
-
   ### Service monitoring, if enabled ( monitor => true )
   if $dovecot::bool_monitor == true {
     if $dovecot::port != '' {
       monitor::port { "dovecot_${dovecot::protocol}_${dovecot::port}":
         protocol => $dovecot::protocol,
         port     => $dovecot::port,
+        target   => $dovecot::monitor_target,
+        tool     => $dovecot::monitor_tool,
+        enable   => $dovecot::manage_monitor,
+        noop     => $dovecot::noops,
+      }
+    }
+    if $bool_enable_pop3 and $pop3_port != '' {
+      monitor::port { "dovecot_${dovecot::protocol}_${dovecot::pop3_port}":
+        protocol => $dovecot::protocol,
+        port     => $dovecot::pop3_port,
         target   => $dovecot::monitor_target,
         tool     => $dovecot::monitor_tool,
         enable   => $dovecot::manage_monitor,
@@ -427,7 +445,6 @@ class dovecot (
     }
   }
 
-
   ### Firewall management, if enabled ( firewall => true )
   if $dovecot::bool_firewall == true and $dovecot::port != '' {
     firewall { "dovecot_${dovecot::protocol}_${dovecot::port}":
@@ -440,6 +457,20 @@ class dovecot (
       tool        => $dovecot::firewall_tool,
       enable      => $dovecot::manage_firewall,
       noop        => $dovecot::noops,
+    }
+
+    if $bool_enable_pop3 {
+      firewall { "dovecot_${dovecot::protocol}_${dovecot::pop3_port}":
+        source      => $dovecot::firewall_src,
+        destination => $dovecot::firewall_dst,
+        protocol    => $dovecot::protocol,
+        port        => $dovecot::pop3_port,
+        action      => 'allow',
+        direction   => 'input',
+        tool        => $dovecot::firewall_tool,
+        enable      => $dovecot::manage_firewall,
+        noop        => $dovecot::noops,
+      }
     }
   }
 
