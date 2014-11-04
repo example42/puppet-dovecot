@@ -73,12 +73,10 @@ describe 'dovecot' do
   describe 'Test customizations - template' do
     let(:params) { {:template => "dovecot/spec.erb" , :options => { 'opt_a' => 'value_a' } } }
     it 'should generate a valid template' do
-      content = catalogue.resource('file', 'dovecot.conf').send(:parameters)[:content]
-      content.should match "fqdn: rspec.example42.com"
+      should contain_file('dovecot.conf').with_content(/fqdn: rspec.example42.com/)
     end
     it 'should generate a template that uses custom options' do
-      content = catalogue.resource('file', 'dovecot.conf').send(:parameters)[:content]
-      content.should match "value_a"
+      should contain_file('dovecot.conf').with_content(/value_a/)
     end
   end
 
@@ -102,8 +100,7 @@ describe 'dovecot' do
   describe 'Test service autorestart' do
     let(:params) { {:service_autorestart => "no" } }
     it 'should not automatically restart the service, when service_autorestart => false' do
-      content = catalogue.resource('file', 'dovecot.conf').send(:parameters)[:notify]
-      content.should be_nil
+      should contain_file('dovecot.conf').without_notify()
     end
   end
 
