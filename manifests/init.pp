@@ -345,18 +345,18 @@ class dovecot (
 
   ### Managed resources
   package { $dovecot::package:
-    ensure  => $dovecot::manage_package,
-    noop    => $dovecot::noops,
+    ensure => $dovecot::manage_package,
+    noop   => $dovecot::noops,
   }
 
   service { 'dovecot':
-    ensure     => $dovecot::manage_service_ensure,
-    name       => $dovecot::service,
-    enable     => $dovecot::manage_service_enable,
-    hasstatus  => $dovecot::service_status,
-    pattern    => $dovecot::process,
-    require    => Package[$dovecot::package],
-    noop       => $dovecot::noops,
+    ensure    => $dovecot::manage_service_ensure,
+    name      => $dovecot::service,
+    enable    => $dovecot::manage_service_enable,
+    hasstatus => $dovecot::service_status,
+    pattern   => $dovecot::process,
+    require   => Package[$dovecot::package],
+    noop      => $dovecot::noops,
   }
 
   file { 'dovecot.conf':
